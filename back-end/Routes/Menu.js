@@ -7,7 +7,26 @@ import Category from "../Schemas/Category.js";
 const router = express.Router();
 router.use(express.json());
 
-// Get the menu
+// Create Menu
+router.post("/create-menu", async (req, res) => {
+  try {
+    // Variables
+    const { name, doesDelivery, doesCollection } = req.body;
+
+    // Create new menu
+    const newMenu = new Menu({ doesDelivery, doesCollection, name });
+
+    // Save the menu into the database
+    const menu = await newMenu.save();
+
+    res.status(201).json(menu);
+  } catch (error) {
+    console.error("Error creating menu:", error);
+    res.status(500).json({ error: "Unable to create the menu" });
+  }
+});
+
+// Read menu
 router.get("/:menuId", async (req, res) => {
   try {
     // Variables
@@ -29,26 +48,13 @@ router.get("/:menuId", async (req, res) => {
   }
 });
 
-// Create Menu
-router.post("/create-menu", async (req, res) => {
-  try {
-    // Variables
-    const { name, doesDelivery, doesCollection } = req.body;
-
-    // Create new menu
-    const newMenu = new Menu({ doesDelivery, doesCollection, name });
-
-    // Save the menu into the database
-    const menu = await newMenu.save();
-
-    res.status(201).json(menu);
-  } catch (error) {
-    console.error("Error creating menu:", error);
-    res.status(500).json({ error: "Unable to create the menu" });
-  }
+// Update menu
+router.put("/:menuId", async (req, res) => {
+  // Variables
+  //const
 });
 
-// Categories of the menu
+// Read categories of the menu
 router.get("/:menuId/categories", async (req, res) => {
   try {
     // Variables

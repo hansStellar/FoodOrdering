@@ -17,9 +17,9 @@ router.post("/:menuId/create-category", async (req, res) => {
     // Check if the specified menu exists
     const menu = await Menu.findById(menuId);
 
+    // If the menu doesn't exist, return an error
     if (!menu) {
-      // Menu not found, send an error response
-      return res.status(404).json({ error: "Menu not found." });
+      return res.status(404).json({ error: "Menu not found" });
     }
 
     // Check if a category with the same name already exists in the specified menu
@@ -53,8 +53,61 @@ router.post("/:menuId/create-category", async (req, res) => {
   }
 });
 
+// Read Category
+router.get("/read-category/:categoryId", async (req, res) => {
+  try {
+    // Variables
+    const categoryId = req.params.categoryId;
+
+    // Find menu and category
+    const category = await Category.findById(categoryId);
+
+    // Conditionals
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    // Read Category
+    return res.status(202).json(category);
+  } catch (error) {
+    console.error("Error reading category:", error);
+    res.status(500).json({ error: "Unable to read category." });
+  }
+});
+
+// Update Category
+router.put("/edit-category/:categoryId", async (req, res) => {
+  try {
+    // Variables
+    const categoryId = req.params.categoryId;
+    const { name } = req.body;
+
+    // Find the category by its ID
+    const category = await Category.findById(categoryId);
+
+    // If the Category doens't exists, return a 404 response
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    // Update the category's name if the 'name' field is provided in the request
+    if (name) {
+      category.name = name;
+    }
+
+    // Save the updated category
+    const updatedCategory = await category.save();
+
+    // Send a success response with the updated category
+    return res.status(200).json(updatedCategory);
+  } catch (error) {
+    console.error("Error updating category", error);
+    res.status(500).json({ error: "Unable to update category" });
+  }
+});
+
 // Delete Category
-router.delete("/:menuId/delete-category/:categoryId", async (req, res) => {
+router.delete("/delete-category/:categoryId", async (req, res) => {
   try {
     // Variables
     const menuId = req.params.menuId;
