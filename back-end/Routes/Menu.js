@@ -19,10 +19,10 @@ router.post("/create-menu", async (req, res) => {
     // Save the menu into the database
     const menu = await newMenu.save();
 
-    res.status(201).json(menu);
+    return res.status(201).json(menu);
   } catch (error) {
     console.error("Error creating menu:", error);
-    res.status(500).json({ error: "Unable to create the menu" });
+    return res.status(500).json({ error: "Unable to create the menu" });
   }
 });
 
@@ -48,10 +48,76 @@ router.get("/:menuId", async (req, res) => {
   }
 });
 
+// Get all the menus
+router.get("/rq/get-menus", async (req, res) => {
+  try {
+    // Variables
+    const menus = await Menu.find({});
+
+    return res.json({ menus });
+  } catch (error) {
+    console.error("Error fetching data: ", error);
+    return res.status(500).json({ error: "Failed to retrieve data" });
+  }
+});
+
 // Update menu
 router.put("/:menuId", async (req, res) => {
-  // Variables
-  //const
+  try {
+    // Variables
+    const menuId = req.params.menuId;
+
+    // Extract the updated menu data from the request body
+    const updatedMenuData = req.body;
+
+    // Attemp to find and update the menu by its ID
+    const menu = await Menu.findByIdAndUpdate(menuId, updatedMenuData, {
+      new: true,
+    });
+
+    if (menu) {
+      // If the menu was found and updated, respond with the updated menu
+      return res
+        .status(200)
+        .json({ message: "Menu updated successfully", menu: menu });
+    } else {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+  } catch (error) {
+    // Handle any potential errors that might occur during the update
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Delete Menu
+router.delete("/:menuId", async (req, res) => {
+  try {
+    // Variables
+    const menuId = req.params.menuId;
+    const menu = await Menu.findByIdAndDelete(menuId);
+
+    if (menu) {
+      const categories = menu.categories;
+
+      if (categories.length > 0) {
+        for (const categoryId of categories) {
+          await Category.findByIdAndDelete(categoryId);
+        }
+      }
+
+      return res.status(200).json({
+        message:
+          "Menu and its associated categories have been deleted successfully",
+        menu: menu,
+      });
+    }
+
+    if (!menu) {
+      return res.status(404).json({ message: "Menu not found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Read categories of the menu

@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(express.json());
 
 // Crate Category
-router.post("/:menuId/create-category", async (req, res) => {
+router.post("/create-category", async (req, res) => {
   try {
     // Variables
     const { name } = req.body;
@@ -54,7 +54,7 @@ router.post("/:menuId/create-category", async (req, res) => {
 });
 
 // Read Category
-router.get("/read-category/:categoryId", async (req, res) => {
+router.get("/:categoryId", async (req, res) => {
   try {
     // Variables
     const categoryId = req.params.categoryId;
@@ -76,7 +76,7 @@ router.get("/read-category/:categoryId", async (req, res) => {
 });
 
 // Update Category
-router.put("/edit-category/:categoryId", async (req, res) => {
+router.put("/:categoryId", async (req, res) => {
   try {
     // Variables
     const categoryId = req.params.categoryId;
@@ -107,7 +107,7 @@ router.put("/edit-category/:categoryId", async (req, res) => {
 });
 
 // Delete Category
-router.delete("/delete-category/:categoryId", async (req, res) => {
+router.delete("/:categoryId", async (req, res) => {
   try {
     // Variables
     const menuId = req.params.menuId;
