@@ -13,9 +13,11 @@ dotenv.config();
 // Routes
 import menuRoutes from "./Routes/Menu.js";
 import categoryRoutes from "./Routes/Category.js";
+import storeRoutes from "./Routes/Store.js";
 
-app.use("/menu", menuRoutes);
+app.use("/store", menuRoutes);
 app.use("/menu", categoryRoutes);
+app.use("/store", storeRoutes);
 
 // CORS Options
 const corsOptions = {
