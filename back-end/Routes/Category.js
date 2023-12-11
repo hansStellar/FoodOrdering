@@ -1,5 +1,6 @@
 // Components
 import express from "express";
+import Store from "../Schemas/Store.js";
 import Category from "../Schemas/Category.js";
 import Menu from "../Schemas/Menu.js";
 
@@ -8,16 +9,21 @@ const router = express.Router();
 router.use(express.json());
 
 // Create Category
-router.post("/create-category", async (req, res) => {
+router.post("/:storeId/:menuId/create-category", async (req, res) => {
   try {
     // Variables
     const { name } = req.body;
     const menuId = req.params.menuId;
+    const storeId = req.params.storeId;
 
-    // Check if the specified menu exists
+    // Check if the specified menu & store exists
     const menu = await Menu.findById(menuId);
+    const store = await Store.findById(storeId);
 
-    // If the menu doesn't exist, return an error
+    if (!store) {
+      return res.status(404).json({ error: "Store not found" });
+    }
+
     if (!menu) {
       return res.status(404).json({ error: "Menu not found" });
     }
@@ -54,15 +60,27 @@ router.post("/create-category", async (req, res) => {
 });
 
 // Read Category
-router.get("/:categoryId", async (req, res) => {
+router.get("/:storeId/:menuId/category/:categoryId", async (req, res) => {
   try {
     // Variables
+    const storeId = req.params.storeId;
+    const menuId = req.params.menuId;
     const categoryId = req.params.categoryId;
 
-    // Find menu and category
+    // Find
+    const store = await Store.findById(storeId);
+    const menu = await Menu.findById(menuId);
     const category = await Category.findById(categoryId);
 
     // Conditionals
+    if (!store) {
+      return res.status(404).json({ error: "Store not found" });
+    }
+
+    if (!menu) {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
     }
@@ -72,6 +90,36 @@ router.get("/:categoryId", async (req, res) => {
   } catch (error) {
     console.error("Error reading category:", error);
     res.status(500).json({ error: "Unable to read category." });
+  }
+});
+
+// Read Categories
+router.get("/:storeId/:menuId/read-categories", async (req, res) => {
+  try {
+    // Variables
+    const storeId = req.params.storeId;
+    const menuId = req.params.menuId;
+
+    // Find
+    const store = await Store.findById(storeId);
+    const menu = await Menu.findById(menuId).populate("categories");
+
+    // Conditionals
+    if (!store) {
+      return res.status(404).json({ error: "Store not found" });
+    }
+
+    if (!menu) {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+
+    // Read Categories
+    return res.status(202).json({ categories: menu.categories });
+  } catch (error) {
+    console.error("Error reading category:", error);
+    res
+      .status(500)
+      .json({ error: "Unable to read category.", details: error.message });
   }
 });
 
