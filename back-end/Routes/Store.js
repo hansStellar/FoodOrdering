@@ -23,6 +23,7 @@ router.post("/create-store", async (req, res) => {
     const newStore = new Store({
       name,
       description,
+      menu: null, // Set the menu property to false by default
     });
 
     await newStore.save();
@@ -37,7 +38,7 @@ router.post("/create-store", async (req, res) => {
 });
 
 // Read Store
-router.get("/:storeId/", async (req, res) => {
+router.get("/singleStore/:storeId/", async (req, res) => {
   // Variables
   const storeId = req.params.storeId;
 
@@ -61,8 +62,28 @@ router.get("/:storeId/", async (req, res) => {
   }
 });
 
-// Update Store
+// Read All Stores
+router.get("/getAllStores", async (req, res) => {
+  try {
+    // Fetch all stores from the database
+    const stores = await Store.find();
 
+    // Check if any stores were found
+    if (stores.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "There are no stores in the database" });
+    }
+
+    // Send the stores as a JSON response
+    return res.status(200).json({ stores });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Update Store
 router.put("/:storeId", async (req, res) => {
   // Variables
   const storeId = req.params.storeId;
@@ -92,7 +113,6 @@ router.put("/:storeId", async (req, res) => {
 });
 
 // Delete Store
-
 router.delete("/:storeId", async (req, res) => {
   // Variables
   const storeId = req.params.storeId;

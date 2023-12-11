@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 // Variables
 const Schema = mongoose.Schema;
 const menuSchema = new Schema({
-  name: String,
   doesDelivery: Boolean,
   doesCollection: Boolean,
   categories: [{ type: Schema.Types.ObjectId, ref: "Category" }],

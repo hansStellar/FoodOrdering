@@ -7,7 +7,7 @@ import Menu from "../Schemas/Menu.js";
 const router = express.Router();
 router.use(express.json());
 
-// Crate Category
+// Create Category
 router.post("/create-category", async (req, res) => {
   try {
     // Variables

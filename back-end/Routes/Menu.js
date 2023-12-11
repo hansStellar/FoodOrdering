@@ -14,7 +14,7 @@ router.post("/:storeId/create-menu", async (req, res) => {
     // Variables
     const storeId = req.params.storeId;
     const store = await Store.findById(storeId);
-    const { name, doesDelivery, doesCollection } = req.body;
+    const { doesDelivery, doesCollection } = req.body;
 
     if (!store) {
       return res.status(500).json({ message: "Store hasn't been found" });
@@ -28,7 +28,7 @@ router.post("/:storeId/create-menu", async (req, res) => {
     }
 
     // Create new menu
-    const newMenu = new Menu({ doesDelivery, doesCollection, name });
+    const newMenu = new Menu({ doesDelivery, doesCollection });
 
     // Save the new category to get its _id
     const createdMenu = await newMenu.save();
@@ -136,7 +136,7 @@ router.delete("/:storeId/:menuId", async (req, res) => {
     const menu = await Menu.findByIdAndDelete(menuId);
 
     if (menu) {
-      store.menu = undefined;
+      store.menu = null;
       await store.save();
       const categories = menu.categories;
 

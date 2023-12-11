@@ -15,9 +15,9 @@ import menuRoutes from "./Routes/Menu.js";
 import categoryRoutes from "./Routes/Category.js";
 import storeRoutes from "./Routes/Store.js";
 
-app.use("/store", menuRoutes);
-app.use("/menu", categoryRoutes);
 app.use("/store", storeRoutes);
+app.use("/store", menuRoutes);
+app.use("/store", categoryRoutes);
 
 // CORS Options
 const corsOptions = {
