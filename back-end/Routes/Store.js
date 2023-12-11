@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import express, { Router } from "express";
 import Store from "../Schemas/Store.js";
+import Menu from "../Schemas/Menu.js";
 
 // Variables
 const router = express.Router();
@@ -121,6 +122,18 @@ router.delete("/:storeId", async (req, res) => {
     const store = await Store.findByIdAndDelete(storeId);
 
     if (store) {
+      if (store.menu !== null) {
+        const menu = await Menu.findByIdAndDelete(store.menu._id);
+
+        return res
+          .status(201)
+          .json({
+            message: "Store and menu has been deleted succesfully",
+            store,
+            menu,
+          });
+      }
+
       return res
         .status(201)
         .json({ message: "Store has been deleted successfully", store });
