@@ -124,21 +124,38 @@ router.get("/:storeId/:menuId/read-categories", async (req, res) => {
 });
 
 // Update Category
-router.put("/:categoryId", async (req, res) => {
+router.put("/:storeId/:menuId/category/:categoryId", async (req, res) => {
   try {
     // Variables
+    const storeId = req.params.storeId;
+    const menuId = req.params.menuId;
     const categoryId = req.params.categoryId;
     const { name } = req.body;
 
     // Find the category by its ID
+    const store = await Store.findById(storeId);
+    const menu = await Menu.findById(menuId);
     const category = await Category.findById(categoryId);
 
-    // If the Category doens't exists, return a 404 response
+    if (!store) {
+      return res.status(404).json({ error: "Store not found" });
+    }
+
+    if (!menu) {
+      return res.status(404).json({ error: "Menu not found" });
+    }
+
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
     }
 
-    // Update the category's name if the 'name' field is provided in the request
+    for (const c of menu.categories) {
+      const categoryArray = await Category.findById(c._id);
+      if (categoryArray.name === name) {
+        return res.status(400).json({ error: "Category name already in use" });
+      }
+    }
+
     if (name) {
       category.name = name;
     }
@@ -147,7 +164,10 @@ router.put("/:categoryId", async (req, res) => {
     const updatedCategory = await category.save();
 
     // Send a success response with the updated category
-    return res.status(200).json(updatedCategory);
+    return res.status(200).json({
+      message: "Category has been updated successfully",
+      updatedCategory,
+    });
   } catch (error) {
     console.error("Error updating category", error);
     res.status(500).json({ error: "Unable to update category" });
@@ -155,24 +175,26 @@ router.put("/:categoryId", async (req, res) => {
 });
 
 // Delete Category
-router.delete("/:categoryId", async (req, res) => {
+router.delete("/:storeId/:menuId/category/:categoryId", async (req, res) => {
   try {
     // Variables
+    const storeId = req.params.storeId;
     const menuId = req.params.menuId;
     const categoryId = req.params.categoryId;
 
-    // Find menu by its ID
+    // Find the category by its ID
+    const store = await Store.findById(storeId);
     const menu = await Menu.findById(menuId);
+    const category = await Category.findById(categoryId);
 
-    // If menu doesn't exists
+    if (!store) {
+      return res.status(404).json({ error: "Store not found" });
+    }
+
     if (!menu) {
       return res.status(404).json({ error: "Menu not found" });
     }
 
-    // Find category by its id
-    const category = await Category.findById(categoryId);
-
-    // If category doens't exists
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
     }
